@@ -1,10 +1,6 @@
 import streamlit as st
 from src.get_response import store_context, answer_questions
 
-@st.cache_data
-def get_context(resume_text, job_description):
-    return store_context(resume_text, job_description)
-
 def initialize_session_state():
     if "context" not in st.session_state:
         st.session_state.context = None
@@ -18,7 +14,7 @@ def input_resume_and_job_description():
 
     if st.button("Submit Resume and Job Description"):
         if resume_input.strip() and job_description_input.strip():
-            st.session_state.context = get_context(resume_input, job_description_input)
+            st.session_state.context = store_context(resume_input, job_description_input)
             st.session_state.qa_pairs = []  # Clear previous Q&A pairs when new context is submitted
             st.success("Context stored successfully. You can now ask questions.")
             st.rerun()
@@ -42,7 +38,7 @@ def display_qa_pairs():
         st.subheader("Questions and Answers:")
         for i, (question, answer) in enumerate(st.session_state.qa_pairs):
             st.write(f"**Q{i+1}:** {question}")
-            st.write(f"**A{i+1}:** {answer}")
+            st.markdown(answer, unsafe_allow_html=True)
 
 def clear_context_and_qa():
     if st.button("Clear Context and Q&A"):
@@ -51,9 +47,16 @@ def clear_context_and_qa():
         st.success("Context and Q&A cleared. Please enter new resume and job description.")
         st.rerun()
 
+def add_social_links():
+    st.sidebar.title("Follow Me")
+    st.sidebar.write("[GitHub](https://github.com/rrrreddy)")
+    st.sidebar.write("[LinkedIn](https://www.linkedin.com/in/raghu-konda/)")
+
 def run_app():
-    st.title("Resume and Job Description Analyzer")
-    st.write("This app uses Cohere's NLP capabilities to answer questions based on your resume and job description.")
+    st.title("Interview Assistant")
+    st.write("This app uses Cohere's NLP capabilities to simulate an interviewee and answer questions based on your resume and job description.")
+
+    add_social_links()
 
     initialize_session_state()
 
@@ -65,4 +68,4 @@ def run_app():
         display_qa_pairs()
         clear_context_and_qa()
 
-    st.write("Designed by Raghu")
+    st.write("Designed by Raghu!")
