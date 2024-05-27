@@ -1,6 +1,10 @@
 import streamlit as st
 from src.get_response import store_context, answer_questions
 
+@st.cache_data
+def get_context(resume_text, job_description):
+    return store_context(resume_text, job_description)
+
 def initialize_session_state():
     if "context" not in st.session_state:
         st.session_state.context = None
@@ -14,10 +18,10 @@ def input_resume_and_job_description():
 
     if st.button("Submit Resume and Job Description"):
         if resume_input.strip() and job_description_input.strip():
-            st.session_state.context = store_context(resume_input, job_description_input)
+            st.session_state.context = get_context(resume_input, job_description_input)
             st.session_state.qa_pairs = []  # Clear previous Q&A pairs when new context is submitted
             st.success("Context stored successfully. You can now ask questions.")
-            st.experimental_rerun()
+            st.rerun()
         else:
             st.warning("Please enter both the resume and the job description text.")
 
@@ -29,7 +33,7 @@ def input_question():
         if st.session_state.context and question_input.strip():
             answer = answer_questions(st.session_state.context, question_input)
             st.session_state.qa_pairs.insert(0, (question_input, answer))  # Insert at the beginning to keep the latest at the top
-            st.experimental_rerun()
+            st.rerun()
         else:
             st.warning("Please enter a question.")
 
@@ -45,7 +49,7 @@ def clear_context_and_qa():
         st.session_state.context = None
         st.session_state.qa_pairs = []
         st.success("Context and Q&A cleared. Please enter new resume and job description.")
-        st.experimental_rerun()
+        st.rerun()
 
 def run_app():
     st.title("Resume and Job Description Analyzer")
@@ -61,4 +65,4 @@ def run_app():
         display_qa_pairs()
         clear_context_and_qa()
 
-    st.write("Powered by Streamlit and Cohere")
+    st.write("Designed by Raghu")
